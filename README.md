@@ -1,5 +1,5 @@
 # Dylug
-## A brand new chat app created by AI.
+## A brand new chat app.
 
 Next.js + Supabase (Postgres + Auth + Realtime), deployed on Vercel via GitHub.
 

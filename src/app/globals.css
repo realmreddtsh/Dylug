@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-disc-rail: #1e1f22;
+  --color-disc-side: #2b2d31;
+  --color-disc-chat: #313338;
+  --color-disc-hover: #35373c;
+  --color-disc-active: #404249;
+  --color-disc-text: #dbdee1;
+  --color-disc-muted: #949ba4;
+  --color-disc-brand: #5865f2;
+  --color-disc-green: #23a55a;
+  --color-disc-red: #f23f43;
+}
+
+:root {
+  --background: #313338;
+  --foreground: #dbdee1;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), "Whitney", "Helvetica Neue", Helvetica,
+    Arial, sans-serif;
+}
+
+/* Slim Discord-like scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #1a1b1e transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #1a1b1e;
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}

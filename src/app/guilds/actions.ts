@@ -26,7 +26,7 @@ export async function createGuild(formData: FormData) {
 }
 
 export async function joinGuild(formData: FormData) {
-  const code = String(formData.get("code") ?? "").trim();
+  const code = String(formData.get("code") ?? "").trim().toLowerCase();
   if (!code) throw new Error("Enter an invite code");
   const supabase = await requireUser();
   const { data, error } = await supabase.rpc("join_guild_by_code", {
@@ -42,13 +42,14 @@ export async function createChannel(guildId: string, formData: FormData) {
   const topic = String(formData.get("topic") ?? "").slice(0, 200);
   if (!raw) throw new Error("Enter a channel name");
   const supabase = await requireUser();
-  const { error } = await supabase.rpc("create_channel_in", {
+  const { data, error } = await supabase.rpc("create_channel_in", {
     p_guild_id: guildId,
     cname: raw,
     ctopic: topic,
   });
-  if (error) throw new Error(error.message);
+  if (error || !data) throw new Error(error?.message ?? "Could not create channel");
   revalidatePath(`/guilds/${guildId}`);
+  redirect(`/guilds/${guildId}/${data}`);
 }
 
 export async function createInvite(guildId: string) {

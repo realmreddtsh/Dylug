@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isSupabaseConfigured } from "@/lib/supabase/config";
 
 function slugify(name: string): string {
   const base = name
@@ -13,9 +14,12 @@ function slugify(name: string): string {
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const requested = searchParams.get("next");
+  const next = requested?.startsWith("/") && !requested.startsWith("//")
+    ? requested
+    : "/friends";
 
-  if (code) {
+  if (code && isSupabaseConfigured()) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
@@ -58,6 +62,7 @@ export async function GET(request: Request) {
               .eq("id", user.id);
           }
         }
+        await supabase.from("profiles").update({ status: "online" }).eq("id", user.id);
       }
       return NextResponse.redirect(`${origin}${next}`);
     }

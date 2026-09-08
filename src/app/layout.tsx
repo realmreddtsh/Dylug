@@ -1,32 +1,30 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import type { ReactNode } from "react";
 import "./globals.css";
 import GuildRail from "@/components/GuildRail";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import AppFrame from "@/components/AppFrame";
 
 export const metadata: Metadata = {
-  title: "Dylug",
-  description: "A Discord-like chat app",
+  title: {
+    default: "Dylug — Your place to talk",
+    template: "%s · Dylug",
+  },
+  description: "A realtime community chat app with servers, channels, friends, and direct messages.",
+  applicationName: "Dylug",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  colorScheme: "dark",
+  themeColor: "#1e1f22",
+};
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="flex h-screen overflow-hidden bg-disc-chat text-disc-text">
-        <GuildRail />
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+    <html lang="en" className="h-full antialiased">
+      <body className="flex h-[100dvh] overflow-hidden bg-disc-chat text-disc-text">
+        <AppFrame rail={<GuildRail />}>{children}</AppFrame>
       </body>
     </html>
   );

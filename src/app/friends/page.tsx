@@ -15,27 +15,17 @@ export default async function FriendsPage() {
     .select("user_id,friend_id,status,created_at")
     .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
 
-  const ids = [...new Set((rows ?? []).flatMap((r) => [r.user_id, r.friend_id]))].filter(
-    (id) => id !== user.id
-  );
-  let profiles: Record<string, { username: string; display_name: string; avatar_url: string | null }> = {};
+  const ids = [...new Set((rows ?? []).flatMap((row) => [row.user_id, row.friend_id]))].filter((id) => id !== user.id);
+  let profiles: Record<string, { username: string; display_name: string; avatar_url: string | null; status: "online" | "idle" | "dnd" | "offline" }> = {};
   if (ids.length > 0) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id,username,display_name,avatar_url")
-      .in("id", ids);
-    profiles = Object.fromEntries((data ?? []).map((p) => [p.id, p]));
+    const { data } = await supabase.from("profiles").select("id,username,display_name,avatar_url,status").in("id", ids);
+    profiles = Object.fromEntries((data ?? []).map((profile) => [profile.id, profile]));
   }
 
-  const friends = (rows ?? [])
-    .filter((r) => r.status === "accepted" && r.user_id === user.id)
-    .map((r) => ({ id: r.friend_id, ...profiles[r.friend_id] }));
-  const incoming = (rows ?? [])
-    .filter((r) => r.status === "pending" && r.friend_id === user.id)
-    .map((r) => ({ id: r.user_id, ...profiles[r.user_id] }));
-  const outgoing = (rows ?? [])
-    .filter((r) => r.status === "pending" && r.user_id === user.id)
-    .map((r) => ({ id: r.friend_id, ...profiles[r.friend_id] }));
+  const person = (id: string) => ({ id, ...profiles[id] });
+  const friends = (rows ?? []).filter((row) => row.status === "accepted" && row.user_id === user.id).map((row) => person(row.friend_id));
+  const incoming = (rows ?? []).filter((row) => row.status === "pending" && row.friend_id === user.id).map((row) => person(row.user_id));
+  const outgoing = (rows ?? []).filter((row) => row.status === "pending" && row.user_id === user.id).map((row) => person(row.friend_id));
 
   return (
     <div className="flex min-h-0 flex-1">
